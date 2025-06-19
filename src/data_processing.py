@@ -80,6 +80,7 @@ def load_data():
     'The Ordinary' de los datos coreanos (no es coreana), y convierte precios coreanos de KRW a EUR 
     (tasa de conversión 0.88)
     """
+    # Ruta base dinámica    
     df_kr = pd.read_csv('../data/jolse_products.csv')
     df_eu = pd.read_csv('../data/promofarma_products.csv')
     
