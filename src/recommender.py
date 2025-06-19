@@ -3,7 +3,29 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
 class SkincareRecommender:
+    """
+    Sistema de recomendación de productos de skincare basado en ingredientes.
+    Atributos:
+        model: modelo de Sentence Transformers para embeddings de texto.
+        df_eu: DataFrame con productos europeos
+        df_kr: DataFrame con productos coreanos
+        ingredient_rules: diccionario de reglas para ingredientes por tipo/condición/preocupación.        
+    Métodos principales:
+        - recommend(): recomienda productos según perfil de piel.
+        - compare_products(): encuentra alternativas entre regiones.
+    """
+
+
     def __init__(self, df_eu, df_kr):
+        """
+        Inicializa el recomendador con datos y modelo de embeddings.
+        Argumentos:
+            df_eu (pd.DataFrame): productos europeos
+            df_kr (pd.DataFrame): productos coreanos            
+        Configura:
+            - Modelo 'all-MiniLM-L6-v2' para similitud semántica
+            - Reglas de ingredientes para diferentes perfiles de piel
+        """
         self.model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
         self.df_eu = df_eu
         self.df_kr = df_kr
@@ -28,7 +50,18 @@ class SkincareRecommender:
             }
         }
     
+
     def filter_products(self, df, skin_type, conditions, concerns):
+        """
+        Filtra productos basándose en ingredientes relevantes para el perfil de piel.        
+        Argumentos:
+            df: DataFrame de productos a filtrar.
+            skin_type (str): tipo de piel (oily, dry, normal, combination).
+            conditions (list): condiciones de piel (rosacea, dermatitis, psoriasis).
+            concerns (list): preocupaciones (acne, wrinkles, collagen, calm).            
+        Devuelve:
+            pd.DataFrame: productos filtrados con columna 'score' de coincidencia
+        """
         ingredients = (
             self.ingredient_rules['skin_type'].get(skin_type.lower(), []) +
             [i for c in conditions for i in self.ingredient_rules['conditions'].get(c.lower(), [])] +
@@ -40,7 +73,19 @@ class SkincareRecommender:
         )
         return df[df['score'] > 0]
     
+
     def recommend(self, skin_type, conditions, concerns, region='eu', n=5):
+        """
+        Genera recomendaciones personalizadas de productos.        
+        Argumentos:
+            skin_type: tipo de piel.
+            conditions: Condiciones de piel.
+            concerns: Preocupaciones principales.
+            region: 'eu' o 'kr' para región de productos.
+            n: Número máximo de recomendaciones.            
+        Devuelve:
+            pd.DataFrame: top n productos recomendados, ordenados por similitud.
+        """
         df = self.df_eu if region == 'eu' else self.df_kr
         filtered = self.filter_products(df.copy(), skin_type, conditions, concerns)
         
@@ -59,7 +104,20 @@ class SkincareRecommender:
         
         return filtered.sort_values(['similarity', 'score'], ascending=False).head(n)
 
+
     def compare_products(self, selected_row, region, compare_to, n=5):
+        """
+        Compara un producto con alternativas de otra región.        
+        Argumentoss:
+            selected_row: producto seleccionado.
+            region: región original del producto.
+            compare_to: región para comparar ('eu' o 'kr').
+            n: número máximo de alternativas.            
+        Devuelve:
+            tuple: (producto_original, dataframe_alternativas)            
+        Nota:
+            Calcula puntuación combinada de ingredientes comunes y similitud semántica
+        """
         product = selected_row.copy()
         other_df = self.df_kr if compare_to == 'kr' else self.df_eu
         

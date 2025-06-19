@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 
 
-
 brands_list = [
     "Avène", "Avène", "Avène", "Avène", "Endocare", "Avène", "Rosacure", "Endocare", "Xhekpon", "ISDIN",
     "La Roche-Posay", "Bioderma", "Endocare", "Retincare", "La Roche Posay", "Avène", "Biretix", "Bioderma",
@@ -72,7 +71,15 @@ brands_list = [
     "Eucerin", "LetiAT4", "La Roche-Posay", "Avène", "Sensilis"
     ]
 
+
 def load_data():
+    """    
+    Carga y preprocesa los datos de productos de skincare desde archivos CSV. Devuelve dos DataFrames 
+    con datos de productos coreanos y europeos. Lee archivos CSV del directorio data, estandariza 
+    nombres de columnas para datos EU, maneja ingredientes faltantes/vacíos, filtra la marca 
+    'The Ordinary' de los datos coreanos (no es coreana), y convierte precios coreanos de KRW a EUR 
+    (tasa de conversión 0.88)
+    """
     df_kr = pd.read_csv('../data/jolse_products.csv')
     df_eu = pd.read_csv('../data/promofarma_products.csv')
     
@@ -105,13 +112,27 @@ def load_data():
     
     return df_kr, df_eu
 
+
 def extract_brand(nombre):
+    """
+    Extrae el nombre de la marca del nombre del producto usando una lista predefinida de marcas (el
+    scraping no llegó a hacerlo por sí sólo, y fue muy difícil encontrar otras páginas scrapeables con
+    la información necesaria para el proyecto. Se le pasó la lista entera a ChatGPT para que
+    automáticamente se genere la lista a extraer ).
+    """
     for marca in sorted(set(brands_list), key=lambda x: -len(x)):
         if nombre.lower().startswith(marca.lower()):
             return pd.Series([marca, nombre[len(marca):].strip(" ,.-")])
     return pd.Series(["", nombre])
 
+
 def process_data(df_eu):
+    """
+    Procesa los datos europeos extrayendo marcas de los nombres de productos. Entra df_eu,
+    devuelve el mismo DataFrame con columnas adicionales 'brand' y 'name' procesadas. Añade columna 
+    'brand' con la marca extraída, modifica columna 'name' eliminando la marca y convierte marcas
+    a mayúsculas
+    """
     df_eu[['brand', 'name']] = df_eu['name'].apply(extract_brand)
     df_eu['brand'] = df_eu['brand'].str.upper()
     return df_eu

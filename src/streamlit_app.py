@@ -5,12 +5,17 @@ import os
 from data_processing import load_data, process_data
 from recommender import SkincareRecommender
 
-# Configuración inicial
+
+# CONFIGURACIÓN INICIAL PARA SUPRESIÓN DE AVISOS
 os.environ['STREAMLIT_SERVER_ENABLE_STATIC_FILE_WATCHER'] = 'false'
 warnings.filterwarnings("ignore", category=UserWarning) 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+
 def reset_session_state():
+    """
+    Reinicia el estado de la sesión de Streamlit a valores por defecto.
+    """
     st.session_state.compare_mode = False
     st.session_state.selected_product = None
     st.session_state.original_region = None
@@ -22,7 +27,18 @@ def reset_session_state():
     if 'concerns_select' in st.session_state:
         del st.session_state.concerns_select
 
+
 def display_comparison(original, matches, original_region):
+    """
+    Muestra la comparación entre un producto y sus alternativas.
+    Argumentos de entrada:
+        original: producto original a comparar
+        matches: productos alternativos
+        original_region: región del producto original
+        
+    Devuelve: información detallada del producto original, alternativas con puntuación de coincidencia, 
+    comparación de precios, ingredientes clave.
+    """
     st.subheader(f"🔍 Original {original_region.upper()} Product:")
     col1, col2 = st.columns(2)
     with col1:
@@ -73,7 +89,10 @@ def display_comparison(original, matches, original_region):
                 st.markdown(f"**Key Ingredients:** {', '.join(ingredients)}...")
 
 def run_app():
-    # Inicialización de datos y modelo
+    """
+    - Configura el entorno para suprimir advertencias. Ajusta la ruta de Python para incluir el directorio src.
+    Inicializa y ejecuta la aplicación Streamlit.
+    """
     df_kr, df_eu = load_data()
     df_eu = process_data(df_eu)
     recommender = SkincareRecommender(df_eu, df_kr)

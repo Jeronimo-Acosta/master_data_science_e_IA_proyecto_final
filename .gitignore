@@ -1,0 +1,43 @@
+# Datos
+/data/
+!data/.gitkeep
+
+# Entornos virtuales
+venv/
+.env/
+.venv/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Configuraciones de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos generados por Streamlit
+.streamlit/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de modelos grandes (si los hay)
+*.h5
+*.pkl
+*.joblib
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
