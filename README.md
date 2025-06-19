@@ -53,6 +53,6 @@ Para ejecutar este proyecto:
 - git clone https://github.com/Jeronimo-Acosta/master_data_science_e_IA_proyecto_final
 - cd scripts
 - python -m venv venv (en Windows)
-- .\venv\Scripts\actívate (en Windows)
+- .\venv\Scripts\activate (en Windows)
 - pip install -r requirements.txt
 - streamlit run main.py
